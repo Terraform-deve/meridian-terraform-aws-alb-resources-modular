@@ -1,12 +1,20 @@
 resource "aws_lb_listener_rule" "listener_rule" {
   for_each = var.rules
 
-  listener_arn = each.value.listener_arn
+  listener_arn = (
+    each.value.listener_arn != null
+    ? each.value.listener_arn
+    : aws_lb_listener.listener[coalesce(each.value.listener_key, each.key)].arn
+  )
   priority     = each.value.priority
 
   action {
     type             = "forward"
-    target_group_arn = each.value.target_group_arn
+    target_group_arn = (
+      each.value.target_group_arn != null
+      ? each.value.target_group_arn
+      : aws_lb_target_group.target_group[coalesce(each.value.target_group_key, each.key)].arn
+    )
   }
 
   dynamic "condition" {

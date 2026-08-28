@@ -81,15 +81,16 @@ listeners = {
   app = {
     port                = 80
     protocol            = "HTTP"
-    default_action_type = "fixed-response"
+    default_action_type = "forward"
+    target_group_key    = "example-app-tg"
   }
 }
 
 rules = {
   app = {
-    listener_arn     = "arn:aws:elasticloadbalancing:region:account-id:listener/app/example-app-alb/id/listener-id"
+    listener_key     = "app"
     priority         = 100
-    target_group_arn = "arn:aws:elasticloadbalancing:region:account-id:targetgroup/example-app-tg/id"
+    target_group_key = "example-app-tg"
     path_patterns    = ["/app/*"]
   }
 }
@@ -97,7 +98,7 @@ rules = {
 target_attachments = [
   {
     name             = "app-instance-1"
-    target_group_arn = "arn:aws:elasticloadbalancing:region:account-id:targetgroup/example-app-tg/id"
+    target_group_key = "example-app-tg"
     target_id        = "i-0123456789abcdef0"
     port             = 80
   }
@@ -109,6 +110,7 @@ target_attachments = [
 - All resource maps and lists default to empty, so you can create only the resource types you need.
 - Listener `load_balancer_arn` is fetched automatically from `aws_lb.alb` when the listener key matches an ALB key. For example, `listeners.app` uses `albs.app`.
 - If the listener key is different from the ALB key, set `load_balancer_key = "app"` in the listener block.
-- You can still set `load_balancer_arn` directly for an external load balancer that is not created by this project.
-- Rule and target attachment inputs still use target group/listener ARNs. Use outputs from a previous apply, remote state, or explicit values from your environment.
+- Listener forward actions, listener rules, and target attachments can fetch target group ARNs automatically with `target_group_key`.
+- Listener rules can fetch listener ARNs automatically with `listener_key`.
+- You can still set direct ARN values for resources that are not created by this project.
 - Do not commit `terraform.tfvars` if it contains environment-specific or sensitive values.

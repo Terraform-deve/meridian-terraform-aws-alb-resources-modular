@@ -83,6 +83,7 @@ variable "listeners" {
     certificate_arn = optional(string)
 
     default_action_type = optional(string, "fixed-response")
+    target_group_key    = optional(string)
     target_group_arn    = optional(string)
 
     fixed_response_content_type = optional(string, "text/plain")
@@ -121,23 +122,17 @@ variable "listeners" {
     error_message = "default_action_type must be forward or fixed-response."
   }
 
-  validation {
-    condition = alltrue([
-      for listener in var.listeners :
-      listener.default_action_type == "fixed-response" ||
-      listener.target_group_arn != null
-    ])
-    error_message = "A forward listener requires target_group_arn."
-  }
 }
 
 variable "rules" {
-  description = "Listener rule configurations. Listener and target group are referenced by ARN."
+  description = "Listener rule configurations. Use keys to automatically reference listeners and target groups created by this project, or ARNs for external resources."
 
   type = map(object({
-    listener_arn     = string
+    listener_key     = optional(string)
+    listener_arn     = optional(string)
     priority         = number
-    target_group_arn = string
+    target_group_key = optional(string)
+    target_group_arn = optional(string)
 
     path_patterns = optional(list(string))
     host_headers  = optional(list(string))
@@ -178,15 +173,25 @@ variable "rules" {
 }
 
 variable "target_attachments" {
-  description = "EC2 instance IDs or IP addresses registered against existing target groups."
+  description = "EC2 instance IDs or IP addresses registered against target groups. Use target_group_key for a target group created by this project, or target_group_arn for an external target group."
 
   type = list(object({
     name              = string
-    target_group_arn  = string
+    target_group_key  = optional(string)
+    target_group_arn  = optional(string)
     target_id         = string
     port              = optional(number)
     availability_zone = optional(string)
   }))
 
   default = []
+
+  validation {
+    condition = alltrue([
+      for target in var.target_attachments :
+      target.target_group_key != null ||
+      target.target_group_arn != null
+    ])
+    error_message = "Each target attachment requires target_group_key or target_group_arn."
+  }
 }

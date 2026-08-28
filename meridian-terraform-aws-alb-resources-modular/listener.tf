@@ -20,7 +20,11 @@ resource "aws_lb_listener" "listener" {
 
       content {
         target_group {
-          arn = each.value.target_group_arn
+          arn = (
+            each.value.target_group_arn != null
+            ? each.value.target_group_arn
+            : aws_lb_target_group.target_group[coalesce(each.value.target_group_key, each.key)].arn
+          )
         }
       }
     }
