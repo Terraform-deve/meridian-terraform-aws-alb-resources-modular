@@ -58,7 +58,7 @@ albs = {
   }
 }
 
-target_group_config = [
+target_group = [
   {
     name     = "example-app-tg"
     port     = 80
@@ -78,8 +78,7 @@ target_group_config = [
 ]
 
 listeners = {
-  http = {
-    load_balancer_arn   = "arn:aws:elasticloadbalancing:region:account-id:loadbalancer/app/example-app-alb/id"
+  app = {
     port                = 80
     protocol            = "HTTP"
     default_action_type = "fixed-response"
@@ -108,5 +107,8 @@ target_attachments = [
 ## Notes
 
 - All resource maps and lists default to empty, so you can create only the resource types you need.
-- Listener and rule inputs use ARNs. Use outputs from a previous apply, remote state, or explicit values from your environment.
+- Listener `load_balancer_arn` is fetched automatically from `aws_lb.alb` when the listener key matches an ALB key. For example, `listeners.app` uses `albs.app`.
+- If the listener key is different from the ALB key, set `load_balancer_key = "app"` in the listener block.
+- You can still set `load_balancer_arn` directly for an external load balancer that is not created by this project.
+- Rule and target attachment inputs still use target group/listener ARNs. Use outputs from a previous apply, remote state, or explicit values from your environment.
 - Do not commit `terraform.tfvars` if it contains environment-specific or sensitive values.

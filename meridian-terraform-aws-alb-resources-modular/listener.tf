@@ -1,7 +1,11 @@
 resource "aws_lb_listener" "listener" {
   for_each = var.listeners
 
-  load_balancer_arn = each.value.load_balancer_arn
+  load_balancer_arn = (
+    each.value.load_balancer_arn != null
+    ? each.value.load_balancer_arn
+    : aws_lb.alb[coalesce(each.value.load_balancer_key, each.key)].arn
+  )
   port              = each.value.port
   protocol          = each.value.protocol
 

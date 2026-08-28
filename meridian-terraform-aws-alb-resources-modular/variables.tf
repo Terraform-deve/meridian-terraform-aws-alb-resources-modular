@@ -63,7 +63,7 @@ variable "target_group" {
 
   validation {
     condition = alltrue([
-      for tg in var.target_group_config :
+      for tg in var.target_group :
       contains(["instance", "ip", "lambda", "alb"], tg.target_type)
     ])
     error_message = "target_type must be instance, ip, lambda, or alb."
@@ -71,10 +71,11 @@ variable "target_group" {
 }
 
 variable "listeners" {
-  description = "Listener configurations. The load balancer is referenced by ARN."
+  description = "Listener configurations. Use load_balancer_key to automatically reference an ALB created by this project, or load_balancer_arn for an external ALB."
 
   type = map(object({
-    load_balancer_arn = string
+    load_balancer_key = optional(string)
+    load_balancer_arn = optional(string)
     port              = number
     protocol          = string
 
