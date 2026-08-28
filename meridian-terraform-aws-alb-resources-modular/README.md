@@ -79,16 +79,7 @@ meridian-terraform-aws-alb-resources/
 │       ├── variables.tf
 │       └── outputs.tf
 │
-├── alb/
-│   └── main.tf
-├── targetgroup/
-│   └── main.tf
-├── listener/
-│   └── main.tf
-├── listener-rule/
-│   └── main.tf
-└── target-attachment/
-    └── main.tf
+├──README.md
 ```
 
 ## No hard-coded values
