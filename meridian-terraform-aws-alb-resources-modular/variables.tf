@@ -125,18 +125,25 @@ variable "listeners" {
 }
 
 variable "rules" {
-  description = "Listener rule configurations. Use keys to automatically reference listeners and target groups created by this project, or ARNs for external resources."
+  description = "Listener rule configurations. Uses keys to automatically reference listeners and target groups created by this project, or ARNs for external resources."
 
   type = map(object({
     listener_key     = optional(string)
     listener_arn     = optional(string)
+
     priority         = number
+
     target_group_key = optional(string)
     target_group_arn = optional(string)
 
+    # Normal matching
     path_patterns = optional(list(string))
     host_headers  = optional(list(string))
     source_ips    = optional(list(string))
+
+    # Regex matching
+    path_regex         = optional(list(string))
+    host_header_regex  = optional(list(string))
 
     tags = optional(map(string), {})
   }))
@@ -147,9 +154,12 @@ variable "rules" {
     condition = alltrue([
       for rule in var.rules :
       rule.path_patterns != null ||
+      rule.path_regex != null ||
       rule.host_headers != null ||
+      rule.host_header_regex != null ||
       rule.source_ips != null
     ])
+
     error_message = "Every rule must have at least one condition."
   }
 
@@ -157,9 +167,12 @@ variable "rules" {
     condition = alltrue([
       for rule in var.rules :
       (rule.path_patterns == null || length(rule.path_patterns) > 0) &&
+      (rule.path_regex == null || length(rule.path_regex) > 0) &&
       (rule.host_headers == null || length(rule.host_headers) > 0) &&
+      (rule.host_header_regex == null || length(rule.host_header_regex) > 0) &&
       (rule.source_ips == null || length(rule.source_ips) > 0)
     ])
+
     error_message = "Condition lists cannot be empty."
   }
 
@@ -168,9 +181,11 @@ variable "rules" {
       for rule in var.rules :
       rule.priority >= 1 && rule.priority <= 50000
     ])
+
     error_message = "Listener rule priority must be between 1 and 50000."
   }
 }
+
 
 variable "target_attachments" {
   description = "EC2 instance IDs or IP addresses registered against target groups. Use target_group_key for a target group created by this project, or target_group_arn for an external target group."
