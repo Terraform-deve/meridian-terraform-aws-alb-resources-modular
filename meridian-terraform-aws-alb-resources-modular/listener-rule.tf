@@ -47,5 +47,25 @@ resource "aws_lb_listener_rule" "listener_rule" {
     }
   }
 
+dynamic "condition" {
+  for_each = each.value.path_regex != null ? [1] : []
+
+  content {
+    path_pattern {
+      regex_values = each.value.path_regex
+    }
+  }
+}
+
+dynamic "condition" {
+  for_each = each.value.host_header_regex != null ? [1] : []
+
+  content {
+    host_header {
+      regex_values = each.value.host_header_regex
+    }
+  }
+}
+
   tags = each.value.tags
 }
