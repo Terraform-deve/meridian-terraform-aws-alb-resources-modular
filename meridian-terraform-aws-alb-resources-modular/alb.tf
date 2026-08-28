@@ -1,4 +1,4 @@
-resource "aws_lb" "this" {
+resource "aws_lb" "alb" {
   for_each = var.albs
 
   name               = each.value.name

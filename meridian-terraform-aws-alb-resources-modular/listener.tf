@@ -1,4 +1,4 @@
-resource "aws_lb_listener" "this" {
+resource "aws_lb_listener" "listener" {
   for_each = var.listeners
 
   load_balancer_arn = each.value.load_balancer_arn

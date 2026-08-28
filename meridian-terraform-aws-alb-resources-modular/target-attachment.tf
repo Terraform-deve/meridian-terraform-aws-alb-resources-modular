@@ -1,4 +1,4 @@
-resource "aws_lb_target_group_attachment" "this" {
+resource "aws_lb_target_group_attachment" "target_attachment" {
   for_each = {
     for target in var.target_attachments :
     target.name => target

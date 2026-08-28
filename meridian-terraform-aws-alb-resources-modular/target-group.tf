@@ -1,4 +1,4 @@
-resource "aws_lb_target_group" "this" {
+resource "aws_lb_target_group" "target_group" {
   for_each = {
     for tg in var.target_group_config :
     tg.name => tg

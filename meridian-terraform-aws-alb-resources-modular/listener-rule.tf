@@ -1,4 +1,4 @@
-resource "aws_lb_listener_rule" "this" {
+resource "aws_lb_listener_rule" "listener_rule" {
   for_each = var.rules
 
   listener_arn = each.value.listener_arn
