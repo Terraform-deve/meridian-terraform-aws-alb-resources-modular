@@ -25,7 +25,7 @@ variable "albs" {
   }
 }
 
-variable "target_group_config" {
+variable "target_group" {
   description = "List of target group configurations."
 
   type = list(object({
